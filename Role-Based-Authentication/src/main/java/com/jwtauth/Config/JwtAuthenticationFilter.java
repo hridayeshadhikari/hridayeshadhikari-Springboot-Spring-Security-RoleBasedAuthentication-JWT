@@ -21,19 +21,19 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private JwtService jwtService;
+    private final JwtService jwtService;
     private final UserService userService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String authHeader=request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
-        if(StringUtils.isEmpty(authHeader)||!org.apache.commons.lang3.StringUtils.startsWith(authHeader,"Bearer")){
+        if(StringUtils.isEmpty(authHeader)||!org.apache.commons.lang3.StringUtils.startsWith(authHeader,"Bearer ")){
             filterChain.doFilter(request,response);
             return;
         }
         jwt=authHeader.substring(7);
-        userEmail=jwtService.extractUsername(jwt);
+        userEmail=jwtService.extractUserName(jwt);
 
         if(StringUtils.isNotEmpty(userEmail) && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails=userService.userDetailsService().loadUserByUsername(userEmail);

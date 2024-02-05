@@ -1,6 +1,7 @@
 package com.jwtauth.Service.Impl;
 
 import com.jwtauth.DTO.JwtAuthResponse;
+import com.jwtauth.DTO.RefreshTokenReq;
 import com.jwtauth.DTO.UserLoginDto;
 import com.jwtauth.DTO.UserSignupDto;
 import com.jwtauth.Entity.Role;
@@ -36,12 +37,24 @@ public class AuthServiceImpl implements AuthService {
     }
     public JwtAuthResponse signin(UserLoginDto userLoginDto){
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDto.getEmail(),userLoginDto.getPassword()));
-        var user =userRepository.findByEmail(userLoginDto.getEmail());
+        var user =userRepository.findByEmail(userLoginDto.getEmail()).orElseThrow(()->new IllegalArgumentException("invalid email or password"));
         var jwt=jwtService.generateToken(user);
         var refreshToken=jwtService.generateRefreshToken(new HashMap<>(),user);
         JwtAuthResponse jwtAuthResponse=new JwtAuthResponse();
         jwtAuthResponse.setToken(jwt);
         jwtAuthResponse.setRefreshToken(refreshToken);
         return jwtAuthResponse;
+    }
+    public JwtAuthResponse refreshToken(RefreshTokenReq refreshTokenReq){
+        String userEmail=jwtService.extractUserName(refreshTokenReq.getToken());
+        User user =userRepository.findByEmail(userEmail).orElseThrow();
+        if(jwtService.isTokenValid(refreshTokenReq.getToken(),user)){
+            var jwt=jwtService.generateToken(user);
+            JwtAuthResponse jwtAuthResponse=new JwtAuthResponse();
+            jwtAuthResponse.setToken(jwt);
+            jwtAuthResponse.setRefreshToken(refreshTokenReq.getToken());
+            return jwtAuthResponse;
+        }
+        return null;
     }
 }

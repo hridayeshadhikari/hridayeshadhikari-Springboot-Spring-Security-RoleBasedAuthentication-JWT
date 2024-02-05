@@ -20,13 +20,13 @@ public class JwtServiceImpl implements JwtService {
     public String generateToken(UserDetails userDetails){
         return Jwts.builder().setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+5*60*60))
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
                 .signWith(getSiginKey(),SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public String generateRefreshToken(Map<String ,Object> extraClaims,UserDetails userDetails){
-        return Jwts.builder().setSubject(userDetails.getUsername())
+        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+604800000))
                 .signWith(getSiginKey(),SignatureAlgorithm.HS256)
@@ -45,13 +45,13 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.parserBuilder().setSigningKey(getSiginKey())
                 .build().parseClaimsJws(token).getBody();
     }
-    public String extractUsername(String token){
+    public String extractUserName(String token){
         return extractClaim(token,Claims::getSubject);
 
     }
 
-    public Boolean isTokenValid(String token,UserDetails userDetails){
-        final String username=extractUsername(token);
+    public boolean isTokenValid(String token,UserDetails userDetails){
+        final String username=extractUserName(token);
         return (username.equals(userDetails.getUsername())&&!isTokenExpired(token));
     }
 

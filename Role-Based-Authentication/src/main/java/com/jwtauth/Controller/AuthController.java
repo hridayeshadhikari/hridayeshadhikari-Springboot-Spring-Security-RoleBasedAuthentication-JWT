@@ -1,6 +1,7 @@
 package com.jwtauth.Controller;
 
 import com.jwtauth.DTO.JwtAuthResponse;
+import com.jwtauth.DTO.RefreshTokenReq;
 import com.jwtauth.DTO.UserLoginDto;
 import com.jwtauth.DTO.UserSignupDto;
 import com.jwtauth.Entity.User;
@@ -25,8 +26,13 @@ public class AuthController {
 
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> loginUser(@RequestBody UserLoginDto userLoginDto){
         return ResponseEntity.ok(authService.signin(userLoginDto));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtAuthResponse> refresh(@RequestBody RefreshTokenReq refreshTokenReq){
+        return ResponseEntity.ok(authService.refreshToken(refreshTokenReq));
     }
 }

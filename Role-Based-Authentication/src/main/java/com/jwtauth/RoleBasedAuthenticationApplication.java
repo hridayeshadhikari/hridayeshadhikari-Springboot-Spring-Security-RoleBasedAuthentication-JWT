@@ -3,15 +3,13 @@ package com.jwtauth;
 import com.jwtauth.Entity.Role;
 import com.jwtauth.Entity.User;
 import com.jwtauth.Repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-@RequiredArgsConstructor
+
 @SpringBootApplication
 public class RoleBasedAuthenticationApplication implements CommandLineRunner {
 
@@ -22,10 +20,10 @@ public class RoleBasedAuthenticationApplication implements CommandLineRunner {
         SpringApplication.run(RoleBasedAuthenticationApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
+
+    public void run(String... args){
         User adminAccount=userRepository.findByRole(Role.ADMIN);
-        if(adminAccount==null){
+        if(null==adminAccount){
             User user=new User();
             user.setEmail("harry@gmail.com");
             user.setFirstName("Harry");
